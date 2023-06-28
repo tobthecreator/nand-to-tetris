@@ -1,0 +1,43 @@
+/*
+    There is also this simpler implementation, which I found using 
+    Wolfram to simplify the Boolean Algebra for me
+
+    This equation ends up being 
+    XOR(a,b)= NAND(NAND(a, NOT(b)), NAND(NOT(a), b))
+
+    or
+
+    XOR(a,b)= 
+        NAND(
+            NAND(
+                a, 
+                NOT(b)
+            ), 
+            NAND(
+                NOT(a), 
+                b
+            )
+        )    
+
+    This version, with it's use of NANDs instead of composite gates, is much faster
+*/
+
+CHIP Xor2 {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    // NotA and NotB
+    Not(in=a, out=notA);
+    Not(in=b, out=notB);
+
+    // fn1
+    Nand(a=a, b=notB, out=fn1);
+
+    // fn2
+    Nand(a=notA, b=b, out=fn2);
+
+    // result
+    Nand(a=fn1, b=fn2, out=out);
+
+}

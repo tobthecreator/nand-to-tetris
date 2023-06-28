@@ -1,0 +1,10 @@
+// NAND(a, b) is NOT(AND(a, b)) so we simply AND the inputs then NOT them
+
+CHIP And {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    Nand(a=a, b=b, out=o1);
+    Nand(a=o1, b=o1, out=out);
+}

@@ -1,0 +1,20 @@
+/*
+    Not is direct inversion of inputs.
+
+    NAND has an interesting property that it is always off 
+    when both inputs are on, and always on when both inputs are off
+
+    Sounds like an inversion to me.
+
+    So we make use of NAND's two gates and feed both inputs into NAND.
+
+    If "in" is high, then NAND sees two high inputs and returns low, and vice versa
+*/
+
+CHIP Not {
+    IN in;
+    OUT out;
+
+    PARTS:
+    And(a=in, b=in, out=out);
+}

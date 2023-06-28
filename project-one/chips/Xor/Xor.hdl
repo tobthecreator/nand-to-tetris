@@ -1,0 +1,30 @@
+/*
+    XOR was a little tricky, so I've included two implementations.
+
+    This is the one I knew how to do myself, without optimizations.
+
+    You simply write out the logic table and then find the canonical representation
+
+    Which is:
+
+    XOR(a, b) = !AB + A!B
+*/
+
+CHIP Xor {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    // NotA and NotB
+    Not(in=a, out=notA);
+    Not(in=b, out=notB);
+
+    // Fn1 - !AB
+    And(a=notA, b=b, out=fn1);
+
+    // Fn2 - A!B
+    And(a=a, b=notB, out=fn2);
+
+    // Output
+    Or(a=fn1, b=fn2, out=out);
+}
