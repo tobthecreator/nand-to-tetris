@@ -259,3 +259,69 @@ The idea that Logic Gates don't depend on the implementation of a switch is impo
 Ooooh buddy we love an abstraction layer.
 
 We do not care how the Boolean logic is implemented, only that it meets the qualities of Boolean logic. That means we can build a computer from any system, any API, that is given to us that represents Boolean logic.
+
+Remember the book the 3 Body Problem? In the book, an alien species create a living computer by having folks stand in a formations with flags, and each person had instructions on whether to raise or lower their flag depending on some other flag’s signal. Creating Boolean logic from people in a field lol.
+
+It's all abstraction. And now that we're freed from the implementation via the abstraction, we can focus on the abstract idea of "gates" as a black box.
+
+#### Primitive to Composite Gates
+
+We already know AND, OR and NOT gates. These are our primitive gates.
+
+We can create more complex gates by streaming together the outputs of these primitives.
+
+An AND gate with 3 inputs is `f(x, y, z) = x AND y AND z.` But that can be broken down into and evaluation order of `f(~) = (x AND y) AND z`. Or, if we write it like a function call. `f(~) = AND(AND(x, y), z)`
+
+Or, in order of evaluation:
+
+1. x AND y = v1
+2. v1 AND z = f(~)
+
+In that sense, the combination of these two AND gates into a three input AND gate creates another black box abstraction. We can represent the 3 pin AND gate with a single gate, and not care about the representation below, as long as that representation holds true to the abstraction.
+
+This is how we perform gate logic, or logic design.
+
+Logic design is the art of connecting gates in order to implement more complex functionality; constructing composite gates from primitives. As I said above, these composite gates get the "outside" appearance of our primitives, so they themselves can be used as primitives for even more complex composite gates.
+
+But everything boils back down to AND, OR and NOT baby.
+
+The difference between a Logic Gate's black box "outside" appearance and the "inside" workings is what we'll call "interface" vs "implementation".
+
+Let's think about a XOR gates implementation and interface.
+
+The interface is simple. Two inputs, one output. And a truth table that looks like:
+
+| x   | y   | XOR(x, y) |
+| --- | --- | --------- |
+| 0   | 0   | 0         |
+| 0   | 1   | 1         |
+| 1   | 0   | 1         |
+| 1   | 1   | 0         |
+
+Using our canonical representation function, we can find the equation for this table.
+
+`XOR(x, y) = (!x AND y) OR (x AND !y)`
+
+In a LISPy format, this looks lik
+
+```
+XOR(x, y)
+-> (OR (AND (NOT x) y) (AND x (NOT y)))
+--> OR
+----> AND
+------> NOT
+--------> x
+------> y
+----> AND
+------> x
+------> NOT
+--------> y
+```
+
+That is a total of 5 gates in the implmentation, but still two inputs and one output for the interface itself.
+
+The art of logic design boils down to "how do I fulfill this interface with as few gates as possible".
+
+### Hardware Description Language
+
+Instead of building a bunch of composite chips ourselves, we're going to accept another abstraction - a HDL, or a hardware description language.
