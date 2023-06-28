@@ -1,0 +1,19 @@
+/*
+    DMux handles basically the same as the Mux. It looks complicate, but it simplifies down
+    to being all about the selection bit and what pairs with it.
+
+    When the selection bit is low, we want a.  When high, we want b.
+
+    So OutputA is AND(x, NOT(s)) and OutputB is AND(x, s)
+*/
+
+
+CHIP DMux {
+    IN in, sel;
+    OUT a, b;
+
+    PARTS:
+    Not(in=sel, out=notS);
+    And(a=in, b=notS, out=a);
+    And(a=in, b=sel, out=b);   
+}

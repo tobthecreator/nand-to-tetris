@@ -1,0 +1,27 @@
+/*
+
+    A multiplex seems hard, especially as it adds more selectors and input buses.
+
+    But the equations come together very quickly.
+
+    Every selector bit matches to an input bit.
+
+    Here we have one selector bit, it is either high or low.  
+
+    When the selector is low, we want a.  So the equation for an out=a is out=AND(NOT(s), a)
+
+    When the selector is high, we want a.  So the equation for out=b is out=AND(b, s)
+
+    Then we just OR those bad boys together
+*/
+
+CHIP Mux {
+    IN a, b, sel;
+    OUT out;
+
+    PARTS:
+    Not(in=sel, out=notS);
+    And(a=a, b=notS, out=aOut);
+    And(a=b, b=sel, out=bOut);
+    Or(a=aOut, b=bOut, out=out);
+}
