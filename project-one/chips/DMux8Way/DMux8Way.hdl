@@ -1,0 +1,46 @@
+ CHIP DMux8Way {
+    IN in, sel[3];
+    OUT a, b, c, d, e, f, g, h;
+
+    PARTS:
+    // Remember, we're scaling up from one output to 8
+
+    // We're going to evaluate in reverse order to keep everything easy to follow
+
+    // Stage 1: One signal to two
+    // Wherever s[2] is low, you're now in s2out1
+    // Wherever s[2] is high, you're now in s2out2
+    DMux(in=in, sel=sel[2], a=s2out1, b=s2out2);
+
+    // Stage 2: Two signals to four
+    // If s[2]=0,s[1]=0 -> s1out1
+    // If s[2]=0,s[1]=1 -> s1out2
+    DMux(in=s2out1, sel=sel[1], a=s1out1, b=s1out2);
+
+    // If s[2]=1,s[1]=0 -> s1out3
+    // If s[2]=1,s[1]=1 -> s1out4
+    DMux(in=s2out2, sel=sel[1], a=s1out3, b=s1out4);
+
+    // Stage 3: Four signals to our output pins
+    // If s[2]=0,s[1]=0,s[0]=0 -> a
+    // If s[2]=0,s[1]=0,s[0]=1 -> b
+    DMux(in=s1out1, sel=sel[0], a=a, b=b);
+
+    // If s[2]=0,s[1]=1,s[0]=0 -> c
+    // If s[2]=0,s[1]=1,s[0]=1 -> d
+    DMux(in=s1out2, sel=sel[0], a=c, b=d);
+
+    // If s[2]=1,s[1]=0,s[0]=0 -> e
+    // If s[2]=1,s[1]=0,s[0]=1 -> f
+    DMux(in=s1out3, sel=sel[0], a=e, b=f);
+
+    // If s[2]=1,s[1]=1,s[0]=0 -> g
+    // If s[2]=1,s[1]=1,s[0]=0 -> h
+    DMux(in=s1out4, sel=sel[0], a=g, b=h);
+
+    
+
+    
+
+
+}
