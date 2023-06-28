@@ -325,3 +325,185 @@ The art of logic design boils down to "how do I fulfill this interface with as f
 ### Hardware Description Language
 
 Instead of building a bunch of composite chips ourselves, we're going to accept another abstraction - a HDL, or a hardware description language.
+
+We can pass HDL software to a simulator and model the chip in the computer's memory. We can use these simulations to test inputs and generate outputs.
+
+We can also ascertain cost/speed/power requirements etc.
+
+## Specification
+
+Now we're going to go over a typical set of gates for different kinds of Boolean operations and how they're designed. We're going to start with a NAND gate and derive the others recursively.
+
+### Basic Gates
+
+Chip name: Not
+Inputs: in
+Outputs: out
+Function: If in=0 then out=1 else out=0.
+
+Chip name: And
+Inputs: a, b
+Outputs: out
+Function: If a=b=1 then out=1 else out=0
+
+Chip name: Or
+Inputs: a, b
+Outputs: out
+Function: If a=b=0 then out=0 else out=1.
+
+Chip name: Nand
+Inputs: a, b
+Outputs: out
+Function: If a=b=1 then out=0 else out=1
+Comment: This gate is considered primitive
+
+#### Multiplexer
+
+A multiplexer, or Mux, is a "selector" chip. It has three inputs, a, b and a selection bit. The selection bit chooses which output you want between a or b.
+
+Chip name: Mux
+Inputs: a, b, sel
+Outputs: out
+Function: If sel=0 then out=a else out=b.
+
+Their logic gate looks like this:
+
+| x y sel | f(x, y, sel) |
+| ------- | ------------ |
+| 0 0 0   | 0            |
+| 0 0 1   | 0            |
+| 0 1 0   | 1            |
+| 0 1 1   | 1            |
+| 1 0 0   | 0            |
+| 1 0 1   | 1            |
+| 1 1 0   | 0            |
+| 1 1 1   | 1            |
+
+#### Demultiplexers
+
+In the same vein of multiplexers, demultiplexers are a "selector". They take in a single input and a selector, then return two output pins, a or b. The selector chooses which output pin inherits the input pin's signal.
+
+Chip name: DMux
+Inputs: in, sel
+Outputs: a, b
+Function: If sel=0 then {a=in, b=0} else {a=0, b=in}.
+
+| x sel | fa(x, sel) | fb(x, sel) |
+| ----- | ---------- | ---------- |
+| 0 0   | 0          | 0          |
+| 1 0   | 1          | 0          |
+|       |            |            |
+| 0 1   | 0          | 0          |
+| 1 1   | 0          | 1          |
+
+### Multibit Versions of Basic Gates
+
+Typically computer architecture uses multi-bit arrays called buses. A 32-bit computer is called that because it can compute a Boolean operation on two 32-bit inputs.
+
+The chip to perform this would have 2 32-bit input buses and one 32-bit output bus.
+
+You can think of multibit gates as the scaled versions of their single-bit little brothers.
+
+Chip name: Not16
+Inputs: in[16] // a 16-bit pin
+Outputs: out[16]
+Function: For i=0..15 out[i]=Not(in[i]).
+Comment: Invert every single input.
+
+Chip name: And16
+Inputs: a[16], b[16]
+Outputs: out[16]
+Function: For i=0..15 out[i]=And(a[i],b[i]).
+Comment: AND each bitwise pair
+
+Chip name: Or16
+Inputs: a[16], b[16]
+Outputs: out[16]
+Function: For i=0..15 out[i]=Or(a[i],b[i]).
+Comment: OR each bitwise pair
+
+Chip name: Mux16
+Inputs: a[16], b[16], sel
+Outputs: out[16]
+Function: If sel=0 then for i=0..15 out[i]=a[i]
+else for i=0..15 out[i]=b[i].
+Comment: Works exactly the same as single bit muxes, but with an entire bus.
+
+(note this is not in the book, just me writing)
+Chip name: Dmux16
+Inputs: in[16], sel
+Outputs: aout[16], bout[16]
+Function: If sel=0 then for i=0..15 aout[i]=in[i]
+else for i=0..15 bout[i]=in[i].
+Comment: Works exactly the same as single bit demuxes, but with an entire bus.
+
+### Multiway Gates
+
+Multiway gates, on the other hand, scale up the number of inputs beyond two bits or buses.
+
+Chip name: Or8Way
+Inputs: in[8]
+Outputs: out
+Function: out=Or(in[0],in[1],...,in[7]).
+Cmment: Performs an OR evaluation on all the bits in the bus.
+
+#### Multiway Muxes
+
+Multiway Muxes are described as "m-way, n-bit". A 4 way, 16 bit multiplexer takes in four separate 16 bit buses and selects between them.
+
+The number of selection bits, or controller bits, now have to be scaled because we cannot represent 4 inputs with TRUE/FALSE. You can calculate the number of selection bits you need with k = log2(m), which is 2. That intuively makes sense. Our bits in each bus will only ever scale by 2. For every new pair inputs, we need one more selection bit. log2(m) deconstructs the 2^n n inputs we have into the number of pairs we can represent with one selection bit.
+
+Multiway Mux
+Chip name: Mux4Way16
+Inputs: a[16], b[16], c[16], d[16], sel[2]
+Outputs: out[16]
+Function: If sel=00 then out=a else if sel=01 then out=b
+else if sel=10 then out=c else if sel=11 then out=d
+Comment: The assignment operations mentioned above are all
+16-bit. For example, "out=a" means "for i=0..15
+out[i]=a[i]".
+
+Chip name: Mux8Way16
+Inputs: a[16],b[16],c[16],d[16],e[16],f[16],g[16],h[16],
+sel[3]
+Outputs: out[16]
+Function: If sel=000 then out=a else if sel=001 then out=b
+else if sel=010 out=c ... else if sel=111 then out=h
+Comment: The assignment operations mentioned above are all
+16-bit. For example, "out=a" means "for i=0..15
+out[i]=a[i]".
+
+#### Demux
+
+Okay same thing but for Dmuxes. We also describe them as "m-way, n-bit", except the implementation is flipped from the mux. We take in an n-bit bus and then route it to m possible n-bit output buses. We can calculate our required selection bits here again with k=log2(m) for the exact same reason.
+
+Chip name: DMux4Way
+Inputs: in, sel[2]
+Outputs: a, b, c, d
+Function: If sel=00 then {a=in, b=c=d=0}
+else if sel=01 then {b=in, a=c=d=0}
+else if sel=10 then {c=in, a=b=d=0}
+else if sel=11 then {d=in, a=b=c=0}.
+
+Chip name: DMux8Way
+Inputs: in, sel[3]
+Outputs: a, b, c, d, e, f, g, h
+Function: If sel=000 then {a=in, b=c=d=e=f=g=h=0}
+else if sel=001 then {b=in, a=c=d=e=f=g=h=0}
+else if sel=010 ...
+...
+else if sel=111 then {h=in, a=b=c=d=e=f=g=0}.
+
+## Implementation
+
+In the coursework, we're not going to go implement NOT/AND/OR/XOR/MUX/DMUX and their multibit and multiway brethern.
+
+This section contains hints to those exercises.
+
+## Perspective
+
+We've ignored several things in this chapter that are important.
+
+1. You can build a computer from many combinations of these gates; you can build a computer completely from NOR gates! There are real tradeoffs for doing so, but they're beyond the scope of this course.
+2. We've ignored all implementations of these chips and of their underlying transistors. This is the domain of ECE, and I should dive back into my old books to catch up on all that soon. Maybe before I move on.
+3. We've also ignored efficiencies from the layout of chips and just assume connections can be made easily however we design things. In physical implementations of course, there are tradeoffs to be had about circuit routing.
