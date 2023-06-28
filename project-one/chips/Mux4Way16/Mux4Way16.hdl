@@ -1,0 +1,31 @@
+ 
+
+/*  
+    This one took me a bit.
+
+    Think about it like this.
+
+    I have four possibilities for selections.
+
+    00 - a
+    01 - b
+    10 - c
+    11 - d
+
+    s[0] is our first selection bit on the right. See a pattern?
+
+    It is 0 1 0 1.  So we can evaluate the first bit in a small mux.  
+    
+    Then evaluate the second pairing in a mux for the second bit
+
+*/
+
+CHIP Mux4Way16 {
+    IN a[16], b[16], c[16], d[16], sel[2];
+    OUT out[16];
+
+    PARTS:
+    Mux16(a=a, b=b, sel=sel[0], out=fn1); // 0 is a, 1 is b
+    Mux16(a=c, b=d, sel=sel[0], out=fn2); // 0 is c (short for 10), 1 is d (short for 11)
+    Mux16(a=fn1, b=fn2, sel=sel[1], out=out); // now if s[2] is 1, then it's c or d.
+}
