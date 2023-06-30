@@ -1,8 +1,40 @@
- 
+/*
+    Okay, so you have to step back and look at the bigger picture.
 
-/**
- * Computes the sum of three bits.
- */
+    The most you can ever get here is 3, which 11
+
+    You can only carry once.
+
+    Addition, is, well, additive.  
+    
+    So it's clear we're going to string together the two adders for the sum.
+
+    But we don't know which sum creates a carry, if at all.
+
+    And that to me sounds like an OR statement.  
+*/
+
+/*
+    Let's play that out.
+
+    |   a   |   b   |   sumab  | carry1  |   c   |  sum2  | carry2 | OR(carry) |
+    |   0   |   0   |   0      |    0    |   0   |   0    |   0    | 0         |
+    |   0   |   1   |   1      |    0    |   0   |   1    |   0    | 0         |
+    |   1   |   0   |   1      |    0    |   0   |   1    |   0    | 0         |
+    |   1   |   1   |   0      |    1    |   0   |   0    |   0    | 1         |
+    |                                                              |           |
+    |   0   |   0   |   0      |    0    |   1   |   1    |   0    | 0         |
+    |   0   |   1   |   1      |    0    |   1   |   0    |   1    | 1         |
+    |   1   |   0   |   1      |    0    |   1   |   0    |   1    | 1         |
+    |   1   |   1   |   0      |    1    |   1   |   1    |   0    | 1         |
+
+    We can pretty clearly see the pattern play out above.  Excuse the spacing.
+
+    Sums work exactly as you expect, ending up with the correct digit.  But since 
+    we can only add to three and escalate bits once, we only ever end up with one
+    carry bit from the sum.  So we can or them together while linearly summing the two
+    half adders
+*/
 
 CHIP FullAdder {
     IN a, b, c;  // 1-bit inputs
@@ -10,5 +42,7 @@ CHIP FullAdder {
         carry;   // Left bit of a + b + c
 
     PARTS:
-    // Put you code here:
+        HalfAdder(a=a, b=b, sum=sumab, carry=carry1);
+        HalfAdder(a=sumab, b=c, sum=sum, carry=carry2);
+        Or(a=carry1, b=carry2, out=carry);
 }
