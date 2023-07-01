@@ -1,22 +1,6 @@
-// This file is part of the materials accompanying the book 
-// "The Elements of Computing Systems" by Nisan and Schocken, 
-// MIT Press. Book site: www.idc.ac.il/tecs
-// File name: projects/02/ALU-nostat.tst
 
-// ALU-nostat.tst provides a partial test of the ALU chip.
-// It IS NOT a replacement for ALU.tst.
 
-// ALU-nostat.tst tests only the computation part of the ALU.
-// The 'zr' and 'ng' status outputs are ignored.
-
-// This test lets you concentrate on getting the ALU computation right without the
-// additional task of handling the status outputs.
-
-// Once your ALU passes ALU-nostat.tst you need to test it with ALU.tst.
-// This way, any comparison failures during ALU.tst will be caused by errors in
-// the handling of the 'zr' and 'ng' status outputs.
-
-load ALU.hdl,
+load ALUnostat.hdl,
 output-file ALU-nostat.out,
 compare-to ALU-nostat.cmp,
 output-list x%B1.16.1 y%B1.16.1 zx%B1.1.1 nx%B1.1.1 zy%B1.1.1 

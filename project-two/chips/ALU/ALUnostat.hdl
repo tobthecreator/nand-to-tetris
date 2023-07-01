@@ -23,7 +23,7 @@
 // if (out == 0) set zr = 1
 // if (out < 0) set ng = 1
 
-CHIP ALU {
+CHIP ALUnostat {
     IN  
         x[16], y[16],  // 16-bit inputs        
         zx, // zero the x input?
@@ -56,16 +56,6 @@ CHIP ALU {
 
     // out
     Not16(in=fout, out=notfout);
-    Mux16(a=fout, b=notfout, sel=no, out=result);
-
-    // Not the cleanest way to write this, but the "subbus" declarations left me no choice according to the forums use guides
-    Or16(a=result, b=result, out=out, out[15]=ng, out[0..7]=result07, out[8..15]=result815);
-
-    // zr
-    Or8Way(in=result07, out=zr1);
-    Or8Way(in=result815, out=zr2);
-    Or(a=zr1, b=zr2, out=zr3);
-    Not(in=zr3, out=zr);
-
+    Mux16(a=fout, b=notfout, sel=no, out=out);
 
 }
